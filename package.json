@@ -1,0 +1,29 @@
+{
+  "name": "metalsmith-versioned-posts",
+  "version": "0.0.1",
+  "description": "A metalsmith plugin that converts git repos of posts into public posts with all versions available.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "extend": "2.0.x",
+    "nodegit": "0.2.x"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wilson428/metalsmith-versioned-posts.git"
+  },
+  "keywords": [
+    "metalsmith",
+    "metalsmith-plugins",
+    "versioning",
+    "git"
+  ],
+  "author": "Chris Wilson",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/wilson428/metalsmith-versioned-posts/issues"
+  },
+  "homepage": "https://github.com/wilson428/metalsmith-versioned-posts"
+}
