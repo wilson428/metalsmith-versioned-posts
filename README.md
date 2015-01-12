@@ -5,7 +5,7 @@ A metalsmith plugin that converts Git repositories to posts with all versions pu
 
 ##Installation
 
-	npm install git+ssh://git@github.com:wilson428/metalsmith-versioned-posts.git
+	npm install metalsmith-versioned-posts
 
 ##Usage
 
