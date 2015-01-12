@@ -1,6 +1,6 @@
 {
   "name": "metalsmith-versioned-posts",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A metalsmith plugin that converts git repos of posts into public posts with all versions available.",
   "main": "index.js",
   "scripts": {
@@ -27,5 +27,6 @@
   "bugs": {
     "url": "https://github.com/wilson428/metalsmith-versioned-posts/issues"
   },
-  "homepage": "https://github.com/wilson428/metalsmith-versioned-posts"
+  "homepage": "https://github.com/wilson428/metalsmith-versioned-posts",
+  "devDependencies": {}
 }
