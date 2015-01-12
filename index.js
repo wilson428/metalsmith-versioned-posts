@@ -1,5 +1,4 @@
-//var git = require("nodegit");
-var git  = require('gift');
+var git = require("nodegit");
 var extend = require("extend");
 var debug = require('debug')('metalsmith-versioned-posts');
 var path = require('path');
@@ -8,7 +7,6 @@ var mkdirp = require("mkdirp");
 
 module.exports = plugin;
 
-
 /**
  * Metalsmith plugin that converts git repos of posts into public posts with all versions available.
  *
@@ -16,36 +14,40 @@ module.exports = plugin;
  * @return {Function}
  */
 
+/**
+ * Inspired by https://github.com/jsvine/gekyll
+ * To output the debug info, you can do this when building: DEBUG=metalsmith-versioned-posts ./path/to/metalsmith/CLI
+ */
+
 var default_options = {
-	directories: ["_posts"],
-	layout: "_layouts/repo.html",
-	filename_matches: [ "draft", "index" ],
-	extension_matches: [ "md", "mkd", "markdown", "txt" ],
-	extras: [ "repo", "blobs", "commits", "diffs" ],
-	override: true
+	directories: "ALL",	// can specify an array of root directories in which to look for versioned posts. Useful if want to ignore git repos in /src directory, etc.
+	filename_matches: [ "draft.md", "article.md" ],	
+	extras: [ "repo", "commits", "diffs" ], // need to implement this
+	override: true		// whether to override properties like "date" that may be in original metadata
 }
 
 function plugin(options){
 	options = extend(false, default_options, options || {});
 
 	return function(files, metalsmith, done){
-	    setImmediate(done);
-		Object.keys(files).forEach(function(file){
+		var repo_count = 0;
+
+		Object.keys(files).forEach(function(file) {
 			var filename = path.basename(file).split(".")[0].toLowerCase(),
 				extension = path.basename(file).split(".")[1],
 				directory = path.dirname(file).toLowerCase(),
 				directories = directory.split(path.sep);
 
 			// only look in root directories specified by config 
-			if (~options.directories.indexOf(directories[0])) {
-				// remove any actual git file from Metalsmith's consideration. We're going to look for these later
+			if (options.directories === "ALL" || ~options.directories.indexOf(directories[0])) {
+				// remove any actual git files from Metalsmith's consideration (as well as from production). We're going to look for these later
 				if (/\.git/.test(file)) {
 					delete files[file];
 					return;
 				}
 
-				// look for files that are candidates to have a git repo
-				if (~options.filename_matches.indexOf(filename) || ~options.extension_matches.indexOf(extension)) {
+				// look for files that are candidates to have a git repo, then check if there is a git repo there
+				if (~options.filename_matches.indexOf(filename + "." + extension)) {
 					debug('checking file: %s for a corresponding git repo', file);
 					var pathToRepo = path.join(metalsmith.dir, metalsmith._src, directory),
 						pathToGit = path.join(pathToRepo, ".git"),
@@ -53,70 +55,96 @@ function plugin(options){
 
 					if (hasRepo) {
 						debug("Found repo for %s!", file);
+						repo_count += 1;
 
 						var data = files[file],
 							versions = [];
-							repo = git(pathToGit);
 
-						// commits are in descending order
-						repo.commits(function(err, commits) {
-							commits.forEach(function(commit) {
-								versions.push({
-									id: commit.id,
-									date: commit.committed_date,
-									committer: {
-										name: commit.committer.name,
-										email: commit.committer.email
-									},
-									message: commit.message
-								});
-							});
-
-							// we'll add a boolean in the metadata for easy template handling
-							data.is_repo = true;
-							data.slug = (!options.override && data.slug)? data.slug : directories.slice(-1)[0];
-							data.date = (!options.override && data.date)? data.date : versions[0].date;
-							data.original_date = (!options.override && data.original_date)? data.original_date : versions.slice(-1)[0].date;
-
-							/* extras */
-
-							// commits.json
-							var obj = {
-					            contents: JSON.stringify(versions, null, 2)							
-							}
-							files[path.join(directory, "commits.json")] = obj;
-
-							//blobs
-							repo.tree().blobs(function(err, blobs) {
-								blobs.forEach(function(blob) {
-									var datastream = blob.dataStream(),
-										datum = "";
-
-									console.log(blob.id, datastream.length);
-
-									datastream[0].on('data', function(buffer) {
-										datum += buffer.toString();
-									}).on('end', function(buffer) {
-										files[path.join(directory, "blobs", blob.id, blob.name)] = datum;
-									});
-								});
-							})
-						});
-
-
-
-						/*
-						git.Repository.open(pathToRepo)
+						git.Repository.open(pathToGit)
 							.then(function(repo) {
 								return repo.getMasterCommit();
 							})
 							.then(function(firstCommitOnMaster) {
-						*/
+								var history = firstCommitOnMaster.history();
+
+							    history.on("commit", function(commit) {
+									versions.push({
+										id: commit.sha(),
+										date: commit.date(),
+										committer: {
+											name: commit.author().name(),
+											email: commit.author().email()
+										},
+										message: commit.message().trim()
+									});
+
+									// need to figure out diffs and blobs -- nodegit not well documented
+									// example here https://github.com/nodegit/nodegit/blob/master/example/diff-commits.js
+									/*
+									var diffs = [];
+									commit.getDiff().then(function(diffList) {										
+										diffList.forEach(function(diff) {
+										    diff.patches().forEach(function(patch) {
+										    	// for now, just getting diffs on the article, not any other source files that may exist in repo
+										    	if (path.basename(file) === patch.oldFile().path()) { 
+													var diff = {
+														path_a: patch.oldFile().path(),
+														path_b: patch.newFile().path(),
+														hunks: []
+													};
+													patch.hunks().forEach(function(hunk) {
+														var hunk = {
+															header: hunk.header().trim(),
+															lines: []
+														};
+
+												        hunk.lines().forEach(function(line) {
+												        	hunk.lines.push(String.fromCharCode(line.origin()) + line.content().trim());
+												        });
+													    diff.hunks.push(hunk);
+												    });
+												    diffs.push(diff);
+										    	}
+											});											
+										});										
+									}); */
+							    });
+
+							    history.on("end", function() {
+							    	debug("Done getting commits for", file);
+
+									// we'll add a boolean in the metadata for easy template handling
+									data.is_repo = true;
+									data.slug = (!options.override && data.slug)? data.slug : directories.slice(-1)[0];
+									data.date = (!options.override && data.date)? data.date : versions[0].date;
+									data.original_date = (!options.override && data.original_date)? data.original_date : versions.slice(-1)[0].date;
+									data.versions = versions;
+
+									var obj = {
+							            contents: JSON.stringify(versions, null, 2)							
+									}
+									files[path.join(directory, "commits.json")] = obj;
+
+									// basic way to track async behavior. Should be more error tolerant.
+									repo_count -= 1;
+									if (repo_count == 0) {
+										done();
+									}
+							    });
+
+							    // Start emitting events.
+							    history.start();
+							});
 					}
-					//if (fs.existsSync(directory + ""))
 				}
 			}
 		});
+
+		// we've now scanned each file. If no repos found, we're done.
+		if (!repo_count) {
+			debug("metalsmith-versioned-posts didn't see any eligible repos.");
+			done();		
+		}
 	};
 }
 

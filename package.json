@@ -8,7 +8,9 @@
   },
   "dependencies": {
     "extend": "2.0.x",
-    "nodegit": "0.2.x"
+    "nodegit": "0.2.x",
+    "debug": "~0.7.4",
+    "mkdirp": "0.5.x"
   },
   "repository": {
     "type": "git",
