@@ -7,10 +7,6 @@ A metalsmith plugin that converts Git repositories to posts with all versions pu
 
 	npm install git+ssh://git@github.com:wilson428/metalsmith-versioned-posts.git
 
-##How it works
-
-
-
 ##Usage
 
 Like all plugins, you can either invoke this one through code or configuration:
@@ -20,7 +16,8 @@ Like all plugins, you can either invoke this one through code or configuration:
 In your `metalsmith.json` file:
 
     "metalsmith-versioned-posts": {
-      "directories": ["_posts"]
+      "directories": ["_posts"],
+      "override": false
     }
 
 ###Code
