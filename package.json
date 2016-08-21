@@ -7,9 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "extend": "2.0.x",
-    "nodegit": "0.2.x",
-    "debug": "~0.7.4",
+    "extend": "3.0.x",
+    "nodegit": "0.14.x",
+    "debug": "~2.2.0",
     "mkdirp": "0.5.x"
   },
   "repository": {
