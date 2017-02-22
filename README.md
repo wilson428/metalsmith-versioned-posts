@@ -27,3 +27,6 @@ In your `metalsmith.json` file:
 ##Options
 
 	`directories`: Only look for version-eligible posts in these directories
+
+##Versions
+0.4: Upgraded dependencies

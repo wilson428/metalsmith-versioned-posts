@@ -1,6 +1,6 @@
 {
   "name": "metalsmith-versioned-posts",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "description": "A metalsmith plugin that converts git repos of posts into public posts with all versions available.",
   "main": "index.js",
   "scripts": {
@@ -8,8 +8,8 @@
   },
   "dependencies": {
     "extend": "3.0.x",
-    "nodegit": "0.14.x",
-    "debug": "~2.2.0",
+    "nodegit": "0.17.x",
+    "debug": "~2.6.1",
     "mkdirp": "0.5.x"
   },
   "repository": {
