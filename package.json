@@ -7,10 +7,10 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "extend": "3.0.x",
-    "nodegit": "0.17.x",
-    "debug": "~2.6.1",
-    "mkdirp": "0.5.x"
+    "extend": "3.0.0",
+    "nodegit": "0.18.0",
+    "debug": "2.6.3",
+    "mkdirp": "0.5.1"
   },
   "repository": {
     "type": "git",

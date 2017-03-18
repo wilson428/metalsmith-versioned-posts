@@ -49,7 +49,7 @@ function plugin(options){
 				// look for files that are candidates to have a git repo, then check if there is a git repo there
 				if (~options.filename_matches.indexOf(filename + "." + extension)) {
 					debug('checking file: %s for a corresponding git repo', file);
-					var pathToRepo = path.join(metalsmith.dir, metalsmith._src, directory),
+					var pathToRepo = path.join(metalsmith._directory, metalsmith._source, directory),
 						pathToGit = path.join(pathToRepo, ".git"),
 						hasRepo = fs.existsSync(pathToGit);
 
