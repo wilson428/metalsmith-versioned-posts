@@ -54,8 +54,8 @@ function plugin(options){
 						hasRepo = fs.existsSync(pathToGit);
 
 					if (hasRepo) {
-						debug("Found repo for %s!", file);
 						repo_count += 1;
+						debug("Found repo for %s!", file, repo_count);
 
 						var data = files[file],
 							versions = [];
@@ -111,8 +111,6 @@ function plugin(options){
 							    });
 
 							    history.on("end", function() {
-							    	debug("Done getting commits for", file);
-
 									// we'll add a boolean in the metadata for easy template handling
 									data.is_repo = true;
 									data.slug = (!options.override && data.slug)? data.slug : directories.slice(-1)[0];
@@ -127,6 +125,7 @@ function plugin(options){
 
 									// basic way to track async behavior. Should be more error tolerant.
 									repo_count -= 1;
+							    	debug("Done getting commits for", directory, repo_count);
 									if (repo_count == 0) {
 										done();
 									}
