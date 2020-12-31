@@ -33,10 +33,10 @@ function plugin(options){
 		var repo_count = 0;
 
 		Object.keys(files).forEach(function(file) {
-			var filename = path.basename(file).split(".")[0].toLowerCase(),
-				extension = path.basename(file).split(".")[1],
-				directory = path.dirname(file).toLowerCase(),
-				directories = directory.split(path.sep);
+			const filename = path.basename(file).split(".")[0].toLowerCase();
+			const extension = path.basename(file).split(".")[1];
+			const directory = path.dirname(file).toLowerCase();
+			const directories = directory.split(path.sep);
 
 			// only look in root directories specified by config 
 			if (options.directories === "ALL" || ~options.directories.indexOf(directories[0])) {
