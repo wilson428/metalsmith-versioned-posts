@@ -113,9 +113,12 @@ function plugin(options){
 							    history.on("end", function() {
 									// we'll add a boolean in the metadata for easy template handling
 									data.is_repo = true;
-									data.slug = (!options.override && data.slug)? data.slug : directories.slice(-1)[0];
-									data.date = (!options.override && data.date)? data.date : versions[0].date;
-									data.original_date = (!options.override && data.original_date)? data.original_date : versions.slice(-1)[0].date;
+
+									const overrideMe = data.hasOwnProperty("override") ? data.override : options.override;
+
+									data.slug = (!overrideMe && data.slug)? data.slug : directories.slice(-1)[0];
+									data.date = (!overrideMe && data.date)? data.date : versions[0].date;
+									data.original_date = (!overrideMe && data.original_date)? data.original_date : versions.slice(-1)[0].date;
 									data.versions = versions;
 
 									var obj = {
